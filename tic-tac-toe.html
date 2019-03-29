@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Dev</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            margin: 0 auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<button id="newGames">New game!</button>
+<canvas id="holst" width="160" height="160">
+    Your browser do not support canvas.
+</canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+
+<script>
+    $(function () {
+
+        var grid = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            g = [[[0, 50], [160, 50]], [[0, 110], [160, 110]], [[50, 0], [50, 160]], [[110, 0], [110, 160]]],
+            x = 0, y = 0, count = 0,
+
+            canvas = document.getElementById('holst'),
+            ctx = canvas.getContext('2d');
+
+
+        drawGrid();
+
+        function drawGrid() {
+            ctx.lineWidth = 5;
+
+            for (let i = 0; i < g.length; i++) {
+                for (let j = 0; j < g[i].length; j++) {
+                    for (let k = 0; k < g[i][j].length; k++) {
+                        ctx.moveTo(g[i][j][k], g[i][j][k + 1]);
+                        ctx.lineTo(g[i][j + 1][k], g[i][j + 1][k + 1]);
+                        break;
+                    }
+                    break;
+                }
+            }
+            ctx.stroke();
+        }
+
+        function checkWin() {
+            for (let i = 1; i < 3; i++) {
+                if (
+                    (grid[0][0] === i && grid[1][0] === i && grid[2][0] === i) ||
+                    (grid[0][1] === i && grid[1][1] === i && grid[2][1] === i) ||
+                    (grid[0][2] === i && grid[1][2] === i && grid[2][2] === i) ||
+
+                    (grid[0][0] === i && grid[0][1] === i && grid[0][2] === i) ||
+                    (grid[1][0] === i && grid[1][1] === i && grid[1][2] === i) ||
+                    (grid[2][0] === i && grid[2][1] === i && grid[2][2] === i) ||
+
+                    (grid[0][0] === i && grid[1][1] === i && grid[2][2] === i) ||
+                    (grid[2][0] === i && grid[1][1] === i && grid[0][2] === i)
+                )
+                    return i;
+            }
+
+            let count = 0;
+
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (grid[i][j] !== 0) {
+                        count++;
+                    }
+                }
+            }
+            if (count === 9) {
+                return 0;
+            }
+
+            return -1;
+        }
+
+        function gameOver() {
+            switch (checkWin()) {
+                case 1:
+                    alert('Победил нолик');
+                    reset();
+                    break;
+                case 2:
+                    alert("Победил крестик");
+                    reset();
+                    break;
+                case 0:
+                    alert("ничия");
+                    reset();
+                    break;
+            }
+        }
+
+
+        function drawX(x, y) {
+            ctx.moveTo(x + 10, y + 10);
+            ctx.lineTo(x + 40, y + 40);
+            ctx.moveTo(x + 40, y + 10);
+            ctx.lineTo(x + 10, y + 40);
+            ctx.stroke();
+        }
+
+        function drawY(x, y) {
+            ctx.beginPath();
+            ctx.arc(x + 25, y + 25, 16, 0, 2 * Math.PI, false)
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+
+        function getCoordinate(e) {
+            x = e.offsetX;
+            y = e.offsetY;
+        }
+
+        function reset() {
+            count = 0;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    grid[i][j] = 0;
+                }
+            }
+        }
+
+        $('#holst').click(function (e) {
+            getCoordinate(e);
+            if (x <= 50 && y <= 50) {
+                if (grid[0][0] === 0) {
+                    grid[0][0] = 1;
+                    if (count % 2 === 0) {
+                        grid[0][0] = 1;
+                        drawY(0, 0);
+                    } else {
+                        grid[0][0] = 2;
+                        drawX(0, 0);
+                    }
+                    ++count;
+                }
+            } else if (x <= 110 && y <= 50) {
+                if (grid[0][1] === 0) {
+                    grid[0][1] = 1;
+                    if (count % 2 === 0) {
+                        grid[0][1] = 1;
+                        drawY(60, 0);
+                    } else {
+                        grid[0][1] = 2;
+                        drawX(60, 0);
+                    }
+                    ++count;
+                }
+            } else if (x <= 160 && y <= 50) {
+                if (grid[0][2] === 0) {
+                    grid[0][2] = 1;
+                    if (count % 2 === 0) {
+                        grid[0][2] = 1;
+                        drawY(110, 0);
+                    } else {
+                        grid[0][2] = 2;
+                        drawX(110, 0);
+                    }
+                    ++count;
+                }
+            } else if (x <= 50 && y <= 110) {
+                if (grid[1][0] === 0) {
+                    grid[1][0] = 1;
+                    if (count % 2 === 0) {
+                        grid[1][0] = 1;
+                        drawY(0, 60);
+                    } else {
+                        grid[1][0] = 2;
+                        drawX(0, 60);
+                    }
+                    ++count;
+                }
+            } else if (x <= 110 && y <= 110) {
+                if (grid[1][1] === 0) {
+                    grid[1][1] = 1;
+                    if (count % 2 === 0) {
+                        grid[1][1] = 1;
+                        drawY(60, 60);
+                    } else {
+                        grid[1][1] = 2;
+                        drawX(60, 60);
+                    }
+                    ++count;
+                }
+            } else if (x <= 160 && y <= 110) {
+                if (grid[1][2] === 0) {
+                    grid[1][2] = 1;
+                    if (count % 2 === 0) {
+                        grid[1][2] = 1;
+                        drawY(110, 60);
+                    } else {
+                        grid[1][2] = 2;
+                        drawX(110, 60);
+                    }
+                    ++count;
+                }
+            } else if (x <= 50 && y <= 160) {
+                if (grid[2][0] === 0) {
+                    grid[2][0] = 1;
+                    if (count % 2 === 0) {
+                        grid[2][0] = 1;
+                        drawY(0, 110);
+                    } else {
+                        grid[2][0] = 2;
+                        drawX(0, 110);
+                    }
+                    ++count;
+                }
+            } else if (x <= 110 && y <= 160) {
+                if (grid[2][1] === 0) {
+                    grid[2][1] = 1;
+                    if (count % 2 === 0) {
+                        grid[2][1] = 1;
+                        drawY(60, 110);
+                    } else {
+                        grid[2][1] = 2;
+                        drawX(60, 110);
+                    }
+                    ++count;
+                }
+            } else if (x <= 160 && y <= 160) {
+                if (grid[2][2] === 0) {
+                    grid[2][2] = 1;
+                    if (count % 2 === 0) {
+                        grid[2][2] = 1;
+                        drawY(110, 110);
+                    } else {
+                        grid[2][2] = 2;
+                        drawX(110, 110);
+                    }
+                    ++count;
+                }
+            }
+            gameOver();
+        });
+
+
+        $('#newGames').click(reset);
+    });
+</script>
+</body>
+</html>
